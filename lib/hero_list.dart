@@ -9,8 +9,7 @@ class HeroList extends StatefulWidget {
 }
 
 class _MyHomePageState extends State<HeroList> {
-  var url = Uri.parse(
-      'https://cdn.jsdelivr.net/gh/akabab/superhero-api@0.3.0/api/all.json');
+  var url = Uri.parse('https://cdn.cinemood.club/superhero.json');
 
   SuperHero hero;
 
@@ -25,19 +24,24 @@ class _MyHomePageState extends State<HeroList> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(title: Text('Hero list')),
-      body: FutureBuilder(
+      body: FutureBuilder<SuperHero>(
           future: getJson(),
-          builder: (context, AsyncSnapshot<SuperHero> heroList) {
-            if (heroList.connectionState == ConnectionState.waiting) {
-              return Center(child: CircularProgressIndicator());
-            } else if (heroList.connectionState == ConnectionState.done) {
+          builder: (context, snapshot) {
+            if (snapshot.hasData) {
               return GridView.builder(
                   gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
                       crossAxisCount: 2),
                   itemBuilder: (context, index) {
-                    return Text(heroList.data.name);
+                    return Padding(
+                      padding: const EdgeInsets.all(8.0),
+                      child: Image.network(
+                          snapshot.data.superhero[index].images.md),
+                    );
                   });
+            } else if (snapshot.hasError) {
+              return Center(child: Text(snapshot.error));
             }
+            return Center(child: CircularProgressIndicator());
           }),
     );
   }
